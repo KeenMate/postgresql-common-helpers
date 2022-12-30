@@ -9,6 +9,25 @@ select *
 from start_version_update('1', 'Initial version', _component := 'common_helpers');
 
 /***
+ *    ███████╗██╗  ██╗████████╗███████╗███╗   ██╗███████╗██╗ ██████╗ ███╗   ██╗███████╗
+ *    ██╔════╝╚██╗██╔╝╚══██╔══╝██╔════╝████╗  ██║██╔════╝██║██╔═══██╗████╗  ██║██╔════╝
+ *    █████╗   ╚███╔╝    ██║   █████╗  ██╔██╗ ██║███████╗██║██║   ██║██╔██╗ ██║███████╗
+ *    ██╔══╝   ██╔██╗    ██║   ██╔══╝  ██║╚██╗██║╚════██║██║██║   ██║██║╚██╗██║╚════██║
+ *    ███████╗██╔╝ ██╗   ██║   ███████╗██║ ╚████║███████║██║╚██████╔╝██║ ╚████║███████║
+ *    ╚══════╝╚═╝  ╚═╝   ╚═╝   ╚══════╝╚═╝  ╚═══╝╚══════╝╚═╝ ╚═════╝ ╚═╝  ╚═══╝╚══════╝
+ *
+ */
+
+-- ENSURE PROPER EXTENSIONS
+
+create
+    extension if not exists "uuid-ossp" schema ext;
+create
+    extension if not exists ltree schema ext;
+create
+    extension if not exists unaccent schema ext;
+
+/***
 *    ██╗--██╗███████╗██╗-----██████╗-███████╗██████╗-███████╗
 *    ██║--██║██╔════╝██║-----██╔══██╗██╔════╝██╔══██╗██╔════╝
 *    ███████║█████╗--██║-----██████╔╝█████╗--██████╔╝███████╗
@@ -68,13 +87,13 @@ $$
     -- removes accents (diacritic signs) from a given string --
 with _unaccented as (select ext.unaccent(_text) as _title),
      -- lowercases the string
-     _lowercase as (select lower(_text) as _title
+     _lowercase as (select lower(_title) as _title
                     from _unaccented),
      -- replaces anything that's not a letter, number, hyphen('-'), or underscore('_') with a hyphen('-')
-     _hyphenated as (select regexp_replace(_text, '[^a-z0-9\\-_]+', _separator, 'gi') as _title
+     _hyphenated as (select regexp_replace(_title, '[^a-z0-9\\-_]+', _separator, 'gi') as _title
                      from _lowercase),
      -- trims hyphens('-') if they exist on the head or tail of the string
-     _trimmed as (select trim(BOTH _separator FROM _text) as _title
+     _trimmed as (select trim(BOTH _separator FROM _title) as _title
                   from _hyphenated)
 select _title
 from _trimmed;
@@ -90,13 +109,13 @@ $$
 select helpers.get_code(_text, '-');
 $$;
 
-create function helpers.unaccent_text(_text text) returns text
+create function helpers.unaccent_text(_text text, _lower_text bool default true) returns text
     language plpgsql
     immutable
 as
 $$
 begin
-    return lower(ext.unaccent(_text));
+    return case when _lower_text then lower(ext.unaccent(_text)) else ext.unaccent(_text) end;
 end
 $$;
 

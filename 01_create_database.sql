@@ -1,4 +1,12 @@
-create role km_common_helpers with password 'Password3000!!' login;
+do
+$$
+    -- ensure user role
+    begin
+        if not exists(select * from pg_roles where rolname = 'km_common_helpers') then
+            create role km_common_helpers with password 'Password3000!!' login;
+        end if;
+    end;
+$$;
 
 SELECT pg_terminate_backend(pg_stat_activity.pid)
 FROM pg_stat_activity
