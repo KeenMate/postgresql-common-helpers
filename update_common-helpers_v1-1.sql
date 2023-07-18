@@ -25,17 +25,6 @@ drop function if exists helpers.unaccent_text(_text text, _lower_text boolean);
 
 drop function if exists helpers.normalize_text(_text text);
 
-create function helpers.normalize_text(_text text) returns text
-	immutable
-	strict
-	parallel safe
-	cost 0.01
-	language sql
-as
-$$
-select ext.unaccent(lower(_text));
-$$;
-
 create function helpers.normalize_text(_text text, _lower_text boolean DEFAULT true) returns text
 	immutable
 	strict
