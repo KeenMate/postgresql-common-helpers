@@ -68,7 +68,7 @@ from sorted_values;
 $$;
 
 create or replace function helpers.normalize_jsonb_values(_data jsonb)
-	returns text
+	returns jsonb
 	strict
 	immutable
 	cost 0.1
