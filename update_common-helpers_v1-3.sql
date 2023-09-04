@@ -21,7 +21,7 @@ from start_version_update('1.3', 'Fix of jsonb normalization function', _compone
  */
 
 create or replace function helpers.normalize_jsonb_values(_data jsonb)
-	returns text
+	returns jsonb
 	strict
 	immutable
 	cost 0.1
